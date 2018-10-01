@@ -14,6 +14,7 @@
 #include <sstream>
 #include <iostream>
 #include <vector>
+#include <sstream>
 using namespace std;
 
 class Firm{
@@ -38,9 +39,11 @@ public:
 
 class DataHandle{
 public:
-    DataHandle(string file);
-    string filename;
+    DataHandle(string, string);
+    string in_file;
+    string out_file;
     vector<Firm> _portfolio;
     void ReadData();
+    void WriteData(double*, int, int);
 };
 #endif /* DataHandle_hpp */

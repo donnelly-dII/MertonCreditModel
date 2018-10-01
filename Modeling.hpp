@@ -11,6 +11,8 @@
 #include <vector>
 #include <stdio.h>
 #include "DataHandle.hpp"
+#include <random>
+#include <sstream>
 
 struct Simulation{
     int iterations;
@@ -29,6 +31,7 @@ public:
     vector<Firm> FirmsList;
     double MertonCalc(Firm, int, int);
 private:
+    default_random_engine Generator;
     double* American_GDP_Generator();
     double* Euro_GDP_Generator(double*);
     double* SingleIteration();

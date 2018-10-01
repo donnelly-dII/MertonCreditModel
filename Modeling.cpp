@@ -22,11 +22,11 @@ MonteCarlo::MonteCarlo(Simulation sim, vector<Firm> firms){
     //Set public class members
     Simu = sim;
     FirmsList = firms;
-    SimSumm();
+    //SimSumm();
 }
 
 void MonteCarlo::SimSumm(){
-    cout << "         Begining MonteCarlo Simulation" << "\n" << endl;
+    cout << "MonteCarlo Simulation" << "\n" << endl;
     cout << "Number of firms:      " << FirmsList.size() << "\n" << "Iterations:           " << Simu.iterations << endl;
     cout << "Years per iteration:  " << Simu.years << endl << endl;
 }
@@ -60,13 +60,15 @@ double MonteCarlo::phi(double x)
 }
 
 double MonteCarlo::d2Calc(Firm f, int T, int t){
-    double hold = f.mean;
-    //cout << hold << endl;
+    //cout << f.std_deviation << endl;
+    //cout << f.mean << endl;
     return (log(f.CurrentValue / f.DefaultValue) + (T-t)*((f.mean * .01) - pow((f.std_deviation * .01),2)/2)) / f.std_deviation * sqrt(T-t);
 }
 
 double MonteCarlo::MertonCalc(Firm f, int T, int t){
-    return phi(-d2Calc(f, T, t));
+    double hold = phi(-d2Calc(f, T, t));
+    //cout << hold <<endl;
+    return hold;
 }
 
 /*
@@ -81,9 +83,8 @@ double* MonteCarlo::American_GDP_Generator(){
     double std = Simu.MeanVar;
     for(int ii = 1; ii < Simu.years; ii++){
         //Randomly from the American GDP distribution
-        default_random_engine generator;
         normal_distribution<double> tempDist(mean,std);
-        double sampleRate = tempDist(generator);
+        double sampleRate = tempDist(Generator);
         //Copy the gdp rate into the array
         GDPArr[ii] = sampleRate;
         //Adjust to new mean
@@ -94,11 +95,11 @@ double* MonteCarlo::American_GDP_Generator(){
 
 double* MonteCarlo::Euro_GDP_Generator(double* AmericanArr){
     double* GDPArr = new double[Simu.years];
-    default_random_engine generator;
+    //default_random_engine generator;
     normal_distribution<double> tempDist(Simu.euro_diff_mean,Simu.euro_diff_var);
     for(int ii = 0; ii < Simu.years; ii++){
         //Sample for the scale
-        double sampleRate = tempDist(generator);
+        double sampleRate = tempDist(Generator);
         //Store the Euro gdp rate calculated from the american one
         GDPArr[ii] = AmericanArr[ii] - sampleRate;
     }
@@ -115,8 +116,9 @@ double* MonteCarlo::SingleIteration(){
     //First generate the GDP reuslts
     double* American_GDPs = American_GDP_Generator();
     double* Euro_GDPs = Euro_GDP_Generator(American_GDPs);
-    for(int tt = 0; tt < Simu.years; tt++){
-        for(int ff = 0; ff < FirmsList.size(); ff++){
+    for(int ff = 0; ff < FirmsList.size(); ff++){
+        riskArray[ff] = 0;
+        for(int tt = 0; tt < Simu.years; tt++){
             //Update Firm's growth and volatility
             FirmsList[ff].meanCalc(American_GDPs[tt], Euro_GDPs[tt]);
             FirmsList[ff].DeviationCalc(American_GDPs[tt], Euro_GDPs[tt]);
@@ -133,13 +135,15 @@ double* MonteCarlo::SingleIteration(){
 double* MonteCarlo::Run(){
     //Array to hold total cumulative averages
     double* RiskAverages = new double[FirmsList.size()];
+    for(int ind = 0; ind < FirmsList.size(); ind++){
+        RiskAverages[ind] = 0;
+    }
     //Run the MonteCarlo for each iteration
     for(int ii = 0; ii < Simu.iterations; ii++){
         //Use helper function for each iteration
         double* holdArr = SingleIteration();
         //Total the averages for each firm
         for(int jj = 0; jj < FirmsList.size(); jj ++){
-            double hol = RiskAverages[jj];
             RiskAverages[jj] += holdArr[jj];
         }
     }

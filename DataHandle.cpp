@@ -14,6 +14,7 @@ using namespace std;
 #include <sstream>
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 #include "math.h"
 /*
       ****************************************************************************************************
@@ -21,11 +22,12 @@ using namespace std;
       ****************************************************************************************************
  */
 
-DataHandle::DataHandle(string file){
-    filename = file;
+DataHandle::DataHandle(string in_f, string out_f){
+    in_file = in_f;
+    out_file = out_f;
 }
 void DataHandle::ReadData(){
-    ifstream stream {filename};
+    ifstream stream {in_file};
     if(stream.fail()){
         throw runtime_error("File failed to connect");
     }
@@ -34,9 +36,30 @@ void DataHandle::ReadData(){
     while(stream >> name >>ameriWeight >> ameriCoeff >> euroWeight >> euroCoeff >> prince >> defa){
         _portfolio.push_back(Firm(name, ameriWeight, ameriCoeff, euroWeight, euroCoeff, prince, defa));
     }
-
-    
 };
+
+void DataHandle::WriteData(double* results, int iter, int years){
+    ofstream stream {out_file};
+    if(stream.fail()){
+        throw runtime_error("File failed to connect");
+    }
+    stream << "MonteCarlo Simulation"  << endl;
+    stream << "Number of firms:      " << _portfolio.size() << "\n" << "Iterations:           " << iter << endl;
+    stream << "Years per iteration:  " << years << endl << endl;
+    stream << "Default Risks:" << endl;
+    cout << "MonteCarlo Simulation" << endl;
+    cout << "Number of firms:      " << _portfolio.size() << "\n" << "Iterations:           " << iter << endl;
+    cout << "Years per iteration:  " << years << endl << endl;
+    cout << "Default Risks:" << endl;
+    for(int ii = 0; ii < _portfolio.size(); ii++){
+        stream << _portfolio[ii].FirmName << _portfolio[ii].FirmName << ":    " << setprecision(4) << results[ii]*100  << " %" << endl;
+            cout << _portfolio[ii].FirmName << ":    " << setprecision(4) << results[ii]*100  << " %" << endl;
+    }
+    stream << "\n" << endl;
+    cout << "\n" << endl;
+    ofstream save(out_file);
+    stream.close();
+}
 /*
       ****************************************************************************************************
                                                     Firm
@@ -57,23 +80,20 @@ Firm::Firm(string name, double Aw, double Ac, double Ew, double Ec, double princ
 }
 void Firm::meanCalc(double American_gdp, double Euro_gdp){
     if(American_gdp > 0){
-        mean = American_coefficient*American_weight * (sqrt(American_gdp) - .1875/sqrt(pow(American_gdp,3)));
-        mean += Euro_weight*Euro_coefficient * (sqrt(Euro_gdp) - (.1875/sqrt(pow(American_gdp,3))) - .1);
+        mean = American_coefficient*American_weight * (sqrt(American_gdp) - .28125/sqrt(pow(American_gdp,3)));
+        mean += Euro_weight*Euro_coefficient * (sqrt(American_gdp) - (.28125/sqrt(pow(American_gdp,3))) - .1);
     }
     else{
-        mean = -American_coefficient*American_weight * (sqrt(abs(American_gdp)) - .1875/sqrt(pow(abs(American_gdp),3)));
-        mean -= Euro_weight*Euro_coefficient * (sqrt(abs(American_gdp)) - (.1875/sqrt(pow(abs(American_gdp),3))) - .1);
+        mean = -American_coefficient*American_weight * (sqrt(abs(American_gdp)) - .28125/sqrt(pow(abs(American_gdp),3)));
+        mean -= Euro_weight*Euro_coefficient * (sqrt(abs(American_gdp)) - (.28125/sqrt(pow(abs(American_gdp),3))) - .1);
     }
+    //cout << mean << endl;
 }
 
 void Firm::DeviationCalc(double American_gdp, double Euro_gdp){
     std_deviation = pow(American_coefficient*American_weight,2) * abs(American_gdp);
     std_deviation += pow(Euro_weight*Euro_coefficient, 2) * abs(American_gdp);
     std_deviation -= .04;
-    double hold = pow(mean,2);
     std_deviation += pow(mean, 2);
-    if(std_deviation < 0){
-        cout << "Problem" << endl;
-    }
     std_deviation = sqrt(std_deviation);
 }
