@@ -1,0 +1,62 @@
+Monte Carlo Simulation
+Number of firms:      8
+Iterations:           10000
+Years per iteration:  5
+
+Calculated Risks:
+Firm1    41.97 %
+Firm2    31.71 %
+Firm3    23.97 %
+Firm4    1.077 %
+Firm5    18.37 %
+Firm6    25.61 %
+Firm7    40.01 %
+Firm8    12.8 %
+
+
+Monte Carlo Simulation
+Number of firms:      8
+Iterations:           10000
+Years per iteration:  10
+
+Calculated Risks:
+Firm1    44.52 %
+Firm2    35.24 %
+Firm3    28.62 %
+Firm4    2.36 %
+Firm5    23.22 %
+Firm6    30.03 %
+Firm7    42.88 %
+Firm8    16.87 %
+
+
+Monte Carlo Simulation
+Number of firms:      8
+Iterations:           10000
+Years per iteration:  15
+
+Calculated Risks:
+Firm1    47.9 %
+Firm2    39.03 %
+Firm3    32.44 %
+Firm4    2.979 %
+Firm5    26.51 %
+Firm6    33.91 %
+Firm7    46.62 %
+Firm8    19.28 %
+
+
+Monte Carlo Simulation
+Number of firms:      8
+Iterations:           10000
+Years per iteration:  30
+
+Calculated Risks:
+Firm1    61.12 %
+Firm2    52.95 %
+Firm3    45.84 %
+Firm4    3.973 %
+Firm5    38.16 %
+Firm6    47.78 %
+Firm7    61.15 %
+Firm8    27.51 %
